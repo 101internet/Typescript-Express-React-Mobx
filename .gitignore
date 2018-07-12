@@ -22,3 +22,5 @@ Thumbs.db
 
 # override
 docker-compose.override.yml
+
+config/config_local.json
