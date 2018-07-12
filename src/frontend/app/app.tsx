@@ -6,22 +6,27 @@ import { initStore } from "./stores/createStore";
 import { AdminLayout } from "./layout/admin";
 import { MainPage } from "./page/main";
 import { hot } from "react-hot-loader";
-import {NoMainPage} from "./page/nomain";
+import { NoMainPage } from "./page/nomain";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
 useStrict(true);
 
 const App = () => (
+  <React.Fragment>
+    <CssBaseline />
     <Provider {...initStore(process.env.NODE_ENV == "development")}>
-        <Routes />
+      <Routes />
     </Provider>
+  </React.Fragment>
 );
 
 const Routes = () => (
-    <Router>
-        <Switch>
-            <AdminLayout exact path="/admin" component={MainPage} />
-            <AdminLayout exact path="/admin/page" component={NoMainPage} />
-        </Switch>
-    </Router>
+  <Router>
+    <Switch>
+      <AdminLayout exact path="/admin" component={MainPage} />
+      <AdminLayout exact path="/admin/page" component={NoMainPage} />
+    </Switch>
+  </Router>
 );
 
 export default hot(module)(App);

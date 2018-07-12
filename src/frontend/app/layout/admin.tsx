@@ -1,176 +1,217 @@
 import * as React from "react";
-import { Route, RouteComponentProps } from "react-router";
-import { NavLink } from "react-router-dom";
+import withStyles from "@material-ui/core/styles/withStyles";
 import { IReactComponent } from "mobx-react";
-import {
-    createStyles,
-    withStyles,
-    Theme,
-    Divider,
-    Hidden,
-    IconButton,
-    Typography,
-    Toolbar,
-    AppBar,
-    List,
-    Drawer,
-    ListItem,
-    ListItemText
-} from "@material-ui/core";
-import { Menu as MenuIcon } from "@material-ui/icons";
+import { Theme } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from "@material-ui/core/AppBar";
+import List from "@material-ui/core/List";
+import MenuIcon from "@material-ui/icons/Menu";
+import Drawer from "@material-ui/core/Drawer";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import * as classNames from "classnames";
+import { Route } from "react-router";
+import { NavLink } from "react-router-dom";
 
 const drawerWidth = 240;
-const styles = (theme: Theme) =>
-    createStyles({
-        root: {
-            width: "100%",
-            minHeight: 430,
-            marginTop: theme.spacing.unit * 3,
-            zIndex: 1
-        },
-        appFrame: {
-            position: "relative" as "relative",
-            display: "flex",
-            width: "100%",
-            height: "100%"
-        },
-        appBar: {
-            position: "absolute" as "absolute",
-            marginLeft: drawerWidth,
-            [theme.breakpoints.up("md")]: {
-                width: `calc(100% - ${drawerWidth}px)`
-            }
-        },
-        navIconHide: {
-            [theme.breakpoints.up("md")]: {
-                display: "none"
-            }
-        },
-        drawerHeader: theme.mixins.toolbar,
-        drawerPaper: {
-            width: 250,
-            [theme.breakpoints.up("md")]: {
-                width: drawerWidth,
-                position: "relative",
-                height: "100%"
-            }
-        },
-        content: {
-            backgroundColor: theme.palette.background.default,
-            width: "100%",
-            padding: theme.spacing.unit * 3,
-            height: "auto",
-            marginTop: 56,
-            [theme.breakpoints.up("sm")]: {
-                height: "auto",
-                marginTop: 64
-            }
-        }
-    });
+const styles = theme => ({
+  root: {
+    flexGrow: 1
+  },
+  appFrame: {
+    height: "100%",
+    zIndex: 1,
+    overflow: "hidden" as "hidden",
+    position: "relative" as "relative",
+    display: "flex" as "flex",
+    width: "100%"
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: "absolute" as "absolute",
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  },
+  appBarShift: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  "appBarShift-left": {
+    marginLeft: drawerWidth
+  },
+  "appBarShift-right": {
+    marginRight: drawerWidth
+  },
+  menuButton: {
+    marginLeft: 12,
+    marginRight: 20
+  },
+  hide: {
+    display: "none" as "none"
+  },
+  drawerPaper: {
+    position: "relative" as "relative",
+    width: drawerWidth
+  },
+  drawerHeader: {
+    display: "flex" as "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: "0 8px",
+    ...theme.mixins.toolbar
+  },
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3,
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    })
+  },
+  "content-left": {
+    marginLeft: -drawerWidth
+  },
+  "content-right": {
+    marginRight: -drawerWidth
+  },
+  contentShift: {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  },
+  "contentShift-left": {
+    marginLeft: 0
+  },
+  "contentShift-right": {
+    marginRight: 0
+  },
+  toolbar: theme.mixins.toolbar
+});
 
-export interface LayoutProps extends RouteComponentProps<any> {
-    component: IReactComponent;
-    theme: Theme;
-    classes: any;
-    sites: string[];
+export interface LayoutProps {
+  component: IReactComponent;
+  path: string;
+  theme: Theme;
+  classes: any;
+  render: any;
 }
 
 export interface LayoutState {
-    mobileOpen: boolean;
+  mobileOpen: boolean;
+  open: boolean;
+  anchor: "left" | "right";
 }
 
 class Layout extends React.Component<LayoutProps, LayoutState> {
-    constructor(props, context: any) {
-        super(props, context);
-        this.state = {
-            mobileOpen: false
-        };
-    }
+  state;
 
-    handleDrawerToggle = () => {
-        this.setState({ mobileOpen: !this.state.mobileOpen });
+  constructor(props, context: any) {
+    super(props, context);
+
+    this.state = {
+      open: false,
+      anchor: "left"
     };
+  }
 
-    render() {
-        let { component: Component, classes, theme, ...rest } = this.props;
+  // handleDrawerOpen = () => {
+  //     this.setState({ open: true });
+  // };
 
-        const drawer = (
-            <div>
-                <div className={classes.drawerHeader} />
-                <Divider />
-                <List>
-                    <NavLink to="/admin">
-                        <ListItem button divider>
-                            <ListItemText primary="админка" />
-                        </ListItem>
-                    </NavLink>
+  // handleDrawerClose = () => {
+  //     this.setState({ open: false });
+  // };
 
-                    <NavLink to="/admin/page">
-                        <ListItem button divider>
-                            <ListItemText primary="админка/страницы" />
-                        </ListItem>
-                    </NavLink>
-                </List>
-            </div>
-        );
+  handleChangeAnchor = event => {
+    this.setState({
+      anchor: event.target.value
+    });
+  };
 
-        return (
-            <div className={classes.root}>
-                <div className={classes.appFrame}>
-                    <AppBar className={classes.appBar}>
-                        <Toolbar>
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                onClick={this.handleDrawerToggle}
-                                className={classes.navIconHide}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography variant="title" color="inherit" noWrap>
-                                Админка
-                            </Typography>
-                        </Toolbar>
-                    </AppBar>
-                    <Hidden mdUp>
-                        <Drawer
-                            variant="temporary"
-                            anchor={
-                                theme.direction === "rtl" ? "right" : "left"
-                            }
-                            open={this.state.mobileOpen}
-                            classes={{
-                                paper: classes.drawerPaper
-                            }}
-                            onClose={this.handleDrawerToggle}
-                            ModalProps={{
-                                keepMounted: true // Better open performance on mobile.
-                            }}
-                        >
-                            {drawer}
-                        </Drawer>
-                    </Hidden>
-                    <Hidden smDown implementation="css">
-                        <Drawer
-                            variant="permanent"
-                            open
-                            classes={{
-                                paper: classes.drawerPaper
-                            }}
-                        >
-                            {drawer}
-                        </Drawer>
-                    </Hidden>
-                    <main className={classes.content}>
-                        <Route
-                            {...rest}
-                            render={matchProps => <Component {...matchProps} />}
-                        />
-                    </main>
-                </div>
-            </div>
-        );
-    }
+  handleClickMainMenu = event => {
+    this.setState({
+      open: !this.state.open
+    });
+  };
+
+  render() {
+    let { component: Component, classes, theme, render, ...rest } = this.props;
+    const { anchor, open } = this.state;
+
+    const drawer = (
+      <Drawer
+        variant="persistent"
+        anchor={anchor}
+        open={open}
+        classes={{
+          paper: classes.drawerPaper
+        }}
+      >
+        <div className={classes.toolbar} />
+        <List>
+          <NavLink to="/admin">
+            <ListItem button divider>
+              <ListItemText primary="Mobx демо" />
+            </ListItem>
+          </NavLink>
+
+          <NavLink to="/admin/page">
+            <ListItem button divider>
+              <ListItemText primary="админка/страницы" />
+            </ListItem>
+          </NavLink>
+        </List>
+      </Drawer>
+    );
+
+    return (
+      <div className={classes.root}>
+        <div className={classes.appFrame}>
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={this.handleClickMainMenu}
+                className={classes.menuButton}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="title" color="inherit" noWrap>
+                Administration panel
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          {drawer}
+          <main
+            className={classNames(
+              classes.content,
+              classes[`content-${anchor}`],
+              {
+                [classes.contentShift]: open,
+                [classes[`contentShift-${anchor}`]]: open
+              }
+            )}
+          >
+            <div className={classes.drawerHeader} />
+            <Route
+              {...rest}
+              render={matchProps => <Component {...matchProps} />}
+            />
+          </main>
+        </div>
+      </div>
+    );
+  }
 }
 
-export const AdminLayout: any = withStyles(styles, { withTheme: true })(Layout);
+export const AdminLayout = withStyles(styles, { withTheme: true })(Layout);
